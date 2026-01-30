@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Primary Meta Tags -->
+    <title>PromotionHub - Panneaux Publicitaires à Abidjan</title>
+    <meta name="title" content="PromotionHub - Panneaux Publicitaires à Abidjan" />
+    <meta name="description" content="Trouvez et réservez des panneaux publicitaires à Abidjan et en Côte d'Ivoire. La marketplace de l'affichage extérieur." />
+    <meta name="keywords" content="panneaux publicitaires, affichage, publicité, Abidjan, Côte d'Ivoire, billboard, advertising" />
+    <meta name="author" content="PromotionHub" />
+
+    <!-- Geo Tags -->
+    <meta name="geo.region" content="CI" />
+    <meta name="geo.placename" content="Abidjan" />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#f97316" />
+    <meta name="msapplication-TileColor" content="#f97316" />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="PromotionHub" />
+
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://promotionhub.ci/" />
+    <meta property="og:title" content="PromotionHub - Panneaux Publicitaires à Abidjan" />
+    <meta property="og:description" content="Trouvez et réservez des panneaux publicitaires à Abidjan et en Côte d'Ivoire." />
+    <meta property="og:image" content="https://promotionhub.ci/og-image.jpg" />
+    <meta property="og:locale" content="fr_CI" />
+    <meta property="og:site_name" content="PromotionHub" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://promotionhub.ci/" />
+    <meta name="twitter:title" content="PromotionHub - Panneaux Publicitaires à Abidjan" />
+    <meta name="twitter:description" content="Trouvez et réservez des panneaux publicitaires à Abidjan et en Côte d'Ivoire." />
+    <meta name="twitter:image" content="https://promotionhub.ci/og-image.jpg" />
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.pexels.com" />
+    <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Register Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('SW registered:', reg.scope))
+            .catch(err => console.log('SW registration failed:', err));
+        });
+      }
+    </script>
+  </body>
+</html>

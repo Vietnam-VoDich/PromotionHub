@@ -1,0 +1,315 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum Role {
+  owner
+  advertiser
+  admin
+}
+
+enum ListingStatus {
+  active
+  inactive
+  booked
+}
+
+enum ListingSize {
+  small
+  medium
+  large
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  rejected
+  completed
+  cancelled
+}
+
+enum PaymentStatus {
+  pending
+  success
+  failed
+}
+
+enum PaymentMethod {
+  orange_money
+  mtn_money
+  wave
+  card
+}
+
+enum VerificationStatus {
+  pending
+  approved
+  rejected
+}
+
+// ============================================
+// MODELS
+// ============================================
+
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  passwordHash    String   @map("password_hash")
+  role            Role     @default(advertiser)
+  firstName       String?  @map("first_name")
+  lastName        String?  @map("last_name")
+  phone           String?
+  city            String?
+  avatarUrl       String?  @map("avatar_url")
+  verified        Boolean  @default(false)
+  emailVerified   Boolean  @default(false) @map("email_verified")
+  emailVerifyToken String? @map("email_verify_token")
+  newsletterOptIn Boolean  @default(true) @map("newsletter_opt_in")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // relations
+  listings           Listing[]
+  bookings           Booking[]           @relation("AdvertiserBookings")
+  sentMessages       Message[]           @relation("SentMessages")
+  receivedMessages   Message[]           @relation("ReceivedMessages")
+  reviews            Review[]
+  verificationPhotos VerificationPhoto[]
+  refreshTokens      RefreshToken[]
+  pushSubscriptions  PushSubscription[]
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
+}
+
+model Listing {
+  id                String        @id @default(uuid())
+  ownerId           String        @map("owner_id")
+  title             String
+  description       String?
+  latitude          Float
+  longitude         Float
+  address           String
+  quartier          String
+  size              ListingSize   @default(medium)
+  pricePerMonth     Float         @map("price_per_month")
+  availabilityStart DateTime?     @map("availability_start")
+  availabilityEnd   DateTime?     @map("availability_end")
+  status            ListingStatus @default(active)
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+
+  // relations
+  owner    User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  photos   ListingPhoto[]
+  bookings Booking[]
+  reviews  Review[]
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([quartier])
+  @@index([createdAt])
+  @@index([pricePerMonth])
+  @@map("listings")
+}
+
+model ListingPhoto {
+  id        String   @id @default(uuid())
+  listingId String   @map("listing_id")
+  url       String
+  isPrimary Boolean  @default(false) @map("is_primary")
+  order     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+  @@map("listing_photos")
+}
+
+model Booking {
+  id               String        @id @default(uuid())
+  listingId        String        @map("listing_id")
+  advertiserId     String        @map("advertiser_id")
+  startDate        DateTime      @map("start_date")
+  endDate          DateTime      @map("end_date")
+  totalPrice       Float         @map("total_price")
+  status           BookingStatus @default(pending)
+  contractUrl      String?       @map("contract_url")
+  contractSignedAt DateTime?     @map("contract_signed_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  // relations
+  listing            Listing             @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  advertiser         User                @relation("AdvertiserBookings", fields: [advertiserId], references: [id], onDelete: Cascade)
+  payments           Payment[]
+  messages           Message[]
+  verificationPhotos VerificationPhoto[]
+
+  @@index([listingId])
+  @@index([advertiserId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("bookings")
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  bookingId     String        @map("booking_id")
+  amount        Float
+  currency      String        @default("XOF")
+  paymentMethod PaymentMethod @map("payment_method")
+  status        PaymentStatus @default(pending)
+  transactionId String?       @map("transaction_id")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("payments")
+}
+
+model VerificationPhoto {
+  id         String             @id @default(uuid())
+  bookingId  String             @map("booking_id")
+  photoUrl   String             @map("photo_url")
+  uploadedBy String             @map("uploaded_by")
+  status     VerificationStatus @default(pending)
+  timestamp  DateTime           @default(now())
+  createdAt  DateTime           @default(now()) @map("created_at")
+
+  booking  Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  uploader User    @relation(fields: [uploadedBy], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([status])
+  @@map("verification_photos")
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  senderId   String   @map("sender_id")
+  receiverId String   @map("receiver_id")
+  bookingId  String?  @map("booking_id")
+  content    String
+  isRead     Boolean  @default(false) @map("is_read")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  sender   User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  booking  Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([bookingId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("messages")
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  listingId  String   @map("listing_id")
+  reviewerId String   @map("reviewer_id")
+  rating     Int // 1-5
+  comment    String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  listing  Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reviewer User    @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  @@unique([listingId, reviewerId]) // one review per user per listing
+  @@index([listingId])
+  @@index([reviewerId])
+  @@map("reviews")
+}
+
+model PushSubscription {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("push_subscriptions")
+}
+
+// ============================================
+// NEWSLETTER
+// ============================================
+
+model NewsletterSubscriber {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  firstName     String?   @map("first_name")
+  isActive      Boolean   @default(true) @map("is_active")
+  confirmedAt   DateTime? @map("confirmed_at")
+  unsubscribedAt DateTime? @map("unsubscribed_at")
+  token         String    @unique @default(uuid()) // for unsubscribe link
+  source        String?   // where they signed up (homepage, checkout, etc.)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@index([email])
+  @@index([isActive])
+  @@map("newsletter_subscribers")
+}
+
+model NewsletterCampaign {
+  id          String   @id @default(uuid())
+  subject     String
+  content     String   @db.Text
+  htmlContent String?  @map("html_content") @db.Text
+  sentAt      DateTime? @map("sent_at")
+  sentCount   Int      @default(0) @map("sent_count")
+  openCount   Int      @default(0) @map("open_count")
+  clickCount  Int      @default(0) @map("click_count")
+  status      CampaignStatus @default(draft)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([sentAt])
+  @@map("newsletter_campaigns")
+}
+
+enum CampaignStatus {
+  draft
+  scheduled
+  sending
+  sent
+  cancelled
+}
