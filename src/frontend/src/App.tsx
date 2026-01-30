@@ -13,6 +13,14 @@ import { Checkout } from '@/pages/Checkout';
 import { Profile } from '@/pages/Profile';
 import { Messages } from '@/pages/Messages';
 import { MockupsDemo } from '@/mockups';
+import {
+  AdminDashboard,
+  AdminUsers,
+  AdminListings,
+  AdminVerifications,
+  AdminNewsletter,
+} from '@/pages/admin';
+import { MapSearch } from '@/pages/MapSearch';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuthStore();
@@ -27,6 +35,28 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { user, isAuthenticated, isLoading } = useAuthStore();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user?.role !== 'admin') {
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
@@ -51,6 +81,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/listings" element={<Listings />} />
         <Route path="/listings/:id" element={<ListingDetail />} />
+        <Route path="/map" element={<MapSearch />} />
 
         {/* Mockups Preview - Design System */}
         <Route path="/mockups" element={<MockupsDemo />} />
@@ -102,6 +133,48 @@ function App() {
             <ProtectedRoute>
               <Profile />
             </ProtectedRoute>
+          }
+        />
+
+        {/* Admin routes */}
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <AdminRoute>
+              <AdminUsers />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/listings"
+          element={
+            <AdminRoute>
+              <AdminListings />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/verifications"
+          element={
+            <AdminRoute>
+              <AdminVerifications />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/newsletter"
+          element={
+            <AdminRoute>
+              <AdminNewsletter />
+            </AdminRoute>
           }
         />
 

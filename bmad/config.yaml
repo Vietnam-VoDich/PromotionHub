@@ -1,0 +1,51 @@
+# BMAD Method v6 - Project Configuration
+# Generated: 2026-01-30
+
+project_name: "PromotionHub"
+project_type: "web-app"
+project_level: 2
+description: "Marketplace de panneaux publicitaires en Côte d'Ivoire"
+
+output_folder: "docs"
+
+bmm:
+  workflow_status_file: "docs/bmm-workflow-status.yaml"
+  sprint_status_file: "docs/sprint-status.yaml"
+
+paths:
+  docs: "docs"
+  stories: "docs/stories"
+  tests: "src/backend/src/tests"
+  frontend: "src/frontend"
+  backend: "src/backend"
+
+tech_stack:
+  frontend:
+    - React 19
+    - TypeScript
+    - Tailwind CSS
+    - Zustand
+    - React Query
+  backend:
+    - Express.js
+    - TypeScript
+    - Prisma
+    - PostgreSQL
+  services:
+    - SendGrid (email)
+    - Africa's Talking (SMS)
+    - WhatsApp Business API
+    - Cloudinary (images)
+    - Web Push API
+
+# Phase 2 Sprint - Features to implement
+current_sprint:
+  name: "Phase 2 - Améliorations UX"
+  stories:
+    - dashboard-admin
+    - carte-mapbox
+    - login-social
+    - websocket-chat
+    - donnees-trafic
+    - historique-publicitaires
+    - ia-detection-images

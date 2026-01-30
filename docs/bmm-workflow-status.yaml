@@ -1,0 +1,135 @@
+# BMAD Method v6 - Workflow Status
+# Generated: 2026-01-30
+# Project: PromotionHub
+
+project:
+  name: "PromotionHub"
+  type: "web-app"
+  level: 2
+  description: "Marketplace de panneaux publicitaires en Côte d'Ivoire"
+
+workflow_status:
+  phase_1_discovery:
+    product_brief: "completed"
+    market_research: "completed"
+    status: "completed"
+
+  phase_2_requirements:
+    prd: "completed"
+    tech_spec: "completed"
+    status: "completed"
+
+  phase_3_architecture:
+    architecture_doc: "completed"
+    data_model: "completed"
+    api_design: "completed"
+    status: "completed"
+
+  phase_4_implementation:
+    sprint_planning: "in_progress"
+    current_sprint: "Phase 2 - Améliorations UX"
+    status: "in_progress"
+
+# MVP Phase 1 - COMPLETED
+completed_features:
+  - name: "Backend Express.js + TypeScript"
+    status: "completed"
+  - name: "PostgreSQL + Prisma ORM"
+    status: "completed"
+  - name: "JWT Authentication with refresh tokens"
+    status: "completed"
+  - name: "CRUD Listings, Bookings, Messages, Reviews"
+    status: "completed"
+  - name: "Mobile Money (Orange, MTN, Wave)"
+    status: "completed"
+  - name: "Notifications (Email, SMS, Push)"
+    status: "completed"
+  - name: "Newsletter with double opt-in"
+    status: "completed"
+  - name: "Smart Review Flow"
+    status: "completed"
+  - name: "Frontend React 19 + Tailwind"
+    status: "completed"
+  - name: "PWA with Service Worker"
+    status: "completed"
+
+# Current Sprint - Phase 2
+current_sprint:
+  name: "Phase 2 - Améliorations UX"
+  start_date: "2026-01-30"
+  stories:
+    - id: "PH2-001"
+      name: "dashboard-admin"
+      title: "Dashboard Admin React"
+      priority: "P1"
+      complexity: "medium"
+      status: "completed"
+
+    - id: "PH2-002"
+      name: "carte-mapbox"
+      title: "Carte Interactive Mapbox"
+      priority: "P1"
+      complexity: "medium"
+      status: "completed"
+
+    - id: "PH2-003"
+      name: "login-social"
+      title: "Login Social (Google, Facebook)"
+      priority: "P2"
+      complexity: "low"
+      status: "pending"
+
+    - id: "PH2-004"
+      name: "websocket-chat"
+      title: "WebSocket Chat (Socket.io)"
+      priority: "P2"
+      complexity: "medium"
+      status: "pending"
+
+    - id: "PH2-005"
+      name: "donnees-trafic"
+      title: "Données de Trafic"
+      priority: "P2"
+      complexity: "high"
+      status: "pending"
+
+    - id: "PH2-006"
+      name: "historique-publicitaires"
+      title: "Historique des Publicités"
+      priority: "P3"
+      complexity: "medium"
+      status: "pending"
+
+    - id: "PH2-007"
+      name: "ia-detection-images"
+      title: "IA Détection Images"
+      priority: "P3"
+      complexity: "high"
+      status: "pending"
+
+# Tech Stack
+tech_stack:
+  frontend:
+    - "React 19"
+    - "TypeScript"
+    - "Tailwind CSS"
+    - "Zustand"
+    - "React Query"
+  backend:
+    - "Express.js"
+    - "TypeScript"
+    - "Prisma"
+    - "PostgreSQL"
+  services:
+    - "SendGrid (email)"
+    - "Africa's Talking (SMS)"
+    - "WhatsApp Business API"
+    - "Cloudinary (images)"
+    - "Web Push API"
+  phase2_additions:
+    - "Socket.io (WebSocket)"
+    - "Mapbox GL JS (cartes)"
+    - "Passport.js (OAuth)"
+    - "Google Cloud Vision (IA)"
+
+last_updated: "2026-01-30T00:00:00Z"

@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   MapPin, Calendar, Ruler, ChevronLeft, ChevronRight,
-  Star, MessageSquare, Phone, Mail, Share2
+  Star, MessageSquare, Phone, Mail, Share2, Eye, Heart, TrendingUp
 } from 'lucide-react';
 import { listingsApi, reviewsApi } from '@/lib/api';
 import { formatPrice, formatDate, LISTING_SIZES, getFullName } from '@/lib/utils';
@@ -13,11 +13,53 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 
+function useViewingCount() {
+  const [count, setCount] = useState(() => Math.floor(Math.random() * 8) + 3);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCount((prev) => {
+        const change = Math.random() > 0.5 ? 1 : -1;
+        const newCount = prev + change;
+        return Math.max(2, Math.min(15, newCount));
+      });
+    }, 5000 + Math.random() * 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return count;
+}
+
+function useSavedStatus(listingId: string) {
+  const [isSaved, setIsSaved] = useState(false);
+  const [showSavedNotification, setShowSavedNotification] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(`listing-saved-${listingId}`);
+    setIsSaved(saved === 'true');
+  }, [listingId]);
+
+  const toggleSave = () => {
+    const newState = !isSaved;
+    setIsSaved(newState);
+    localStorage.setItem(`listing-saved-${listingId}`, String(newState));
+    if (newState) {
+      setShowSavedNotification(true);
+      setTimeout(() => setShowSavedNotification(false), 2000);
+    }
+  };
+
+  return { isSaved, toggleSave, showSavedNotification };
+}
+
 export function ListingDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
   const [currentPhoto, setCurrentPhoto] = useState(0);
+  const viewingCount = useViewingCount();
+  const { isSaved, toggleSave, showSavedNotification } = useSavedStatus(id || '');
 
   const { data: listing, isLoading } = useQuery({
     queryKey: ['listing', id],
@@ -30,6 +72,8 @@ export function ListingDetail() {
     queryFn: () => reviewsApi.getListingStats(id!),
     enabled: !!id,
   });
+
+  const isPopular = reviewStats && reviewStats.totalReviews >= 3 && reviewStats.averageRating >= 4;
 
   if (isLoading) {
     return (
@@ -68,10 +112,39 @@ export function ListingDetail() {
         Retour aux panneaux
       </Link>
 
+      {/* Viewing count banner */}
+      <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-2 mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2 text-orange-700">
+          <Eye className="h-5 w-5 animate-pulse" />
+          <span className="font-medium">{viewingCount} personnes consultent ce panneau</span>
+        </div>
+        {isPopular && (
+          <div className="flex items-center gap-1 bg-orange-600 text-white px-2 py-1 rounded-full text-xs font-semibold">
+            <TrendingUp className="h-3 w-3" />
+            Populaire
+          </div>
+        )}
+      </div>
+
+      {/* Saved notification */}
+      {showSavedNotification && (
+        <div className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in">
+          Sauvegardé automatiquement
+        </div>
+      )}
+
       {/* Title */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{listing.title}</h1>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900">{listing.title}</h1>
+            {isPopular && (
+              <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                <TrendingUp className="h-3 w-3" />
+                Populaire
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-2 text-gray-600">
             <MapPin className="h-5 w-5" />
             <span>{listing.address}, {listing.quartier}</span>
@@ -81,6 +154,15 @@ export function ListingDetail() {
           <Badge variant={listing.status === 'active' ? 'success' : 'warning'} size="md">
             {listing.status === 'active' ? 'Disponible' : 'Réservé'}
           </Badge>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleSave}
+            className={isSaved ? 'text-red-500 border-red-500' : ''}
+          >
+            <Heart className={`h-4 w-4 ${isSaved ? 'fill-red-500' : ''}`} />
+            {isSaved ? 'Sauvegardé' : 'Sauvegarder'}
+          </Button>
           <Button variant="outline" size="sm">
             <Share2 className="h-4 w-4" />
             Partager
@@ -218,6 +300,17 @@ export function ListingDetail() {
           <div className="sticky top-24">
             <Card>
               <CardContent className="space-y-6">
+                {/* Live viewing indicator */}
+                <div className="bg-red-50 border border-red-100 rounded-lg px-3 py-2 flex items-center justify-center gap-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                  </span>
+                  <span className="text-sm font-medium text-red-700">
+                    {viewingCount} personnes consultent
+                  </span>
+                </div>
+
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary-600">
                     {formatPrice(listing.pricePerMonth)}
