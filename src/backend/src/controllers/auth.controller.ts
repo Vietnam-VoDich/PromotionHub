@@ -156,4 +156,27 @@ export const authController = {
       next(error);
     }
   },
+
+  async oauthCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = req.user as { id: string; email: string; role: string };
+
+      if (!user) {
+        res.redirect('/login?error=oauth_failed');
+        return;
+      }
+
+      const tokens = await authService.generateTokensForUser(user.id);
+
+      // Redirect to frontend with tokens in URL
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      const redirectUrl = new URL('/auth/callback', frontendUrl);
+      redirectUrl.searchParams.set('accessToken', tokens.accessToken);
+      redirectUrl.searchParams.set('refreshToken', tokens.refreshToken);
+
+      res.redirect(redirectUrl.toString());
+    } catch (error) {
+      next(error);
+    }
+  },
 };

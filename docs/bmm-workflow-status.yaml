@@ -77,7 +77,7 @@ current_sprint:
       title: "Login Social (Google, Facebook)"
       priority: "P2"
       complexity: "low"
-      status: "pending"
+      status: "completed"
 
     - id: "PH2-004"
       name: "websocket-chat"

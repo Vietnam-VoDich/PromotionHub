@@ -1,29 +1,45 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary-50: #fff7ed;
-  --color-primary-100: #ffedd5;
-  --color-primary-200: #fed7aa;
-  --color-primary-300: #fdba74;
-  --color-primary-400: #fb923c;
-  --color-primary-500: #f97316;
-  --color-primary-600: #ea580c;
-  --color-primary-700: #c2410c;
-  --color-primary-800: #9a3412;
-  --color-primary-900: #7c2d12;
-  --color-primary-950: #431407;
+  /* Primary - Orange/Amber accent */
+  --color-primary-50: #fffbeb;
+  --color-primary-100: #fef3c7;
+  --color-primary-200: #fde68a;
+  --color-primary-300: #fcd34d;
+  --color-primary-400: #fbbf24;
+  --color-primary-500: #f59e0b;
+  --color-primary-600: #d97706;
+  --color-primary-700: #b45309;
+  --color-primary-800: #92400e;
+  --color-primary-900: #78350f;
+  --color-primary-950: #451a03;
 
-  --color-secondary-50: #f0fdf4;
-  --color-secondary-100: #dcfce7;
-  --color-secondary-200: #bbf7d0;
-  --color-secondary-300: #86efac;
-  --color-secondary-400: #4ade80;
-  --color-secondary-500: #22c55e;
-  --color-secondary-600: #16a34a;
-  --color-secondary-700: #15803d;
-  --color-secondary-800: #166534;
-  --color-secondary-900: #14532d;
-  --color-secondary-950: #052e16;
+  /* Secondary - Emerald accent */
+  --color-secondary-50: #ecfdf5;
+  --color-secondary-100: #d1fae5;
+  --color-secondary-200: #a7f3d0;
+  --color-secondary-300: #6ee7b7;
+  --color-secondary-400: #34d399;
+  --color-secondary-500: #10b981;
+  --color-secondary-600: #059669;
+  --color-secondary-700: #047857;
+  --color-secondary-800: #065f46;
+  --color-secondary-900: #064e3b;
+  --color-secondary-950: #022c22;
+
+  /* Dark theme base colors */
+  --color-dark-50: #f9fafb;
+  --color-dark-100: #f3f4f6;
+  --color-dark-200: #e5e7eb;
+  --color-dark-300: #d1d5db;
+  --color-dark-400: #9ca3af;
+  --color-dark-500: #6b7280;
+  --color-dark-600: #4b5563;
+  --color-dark-700: #374151;
+  --color-dark-800: #1f2937;
+  --color-dark-850: #18202f;
+  --color-dark-900: #111827;
+  --color-dark-950: #0a0f1a;
 
   --font-sans: 'Inter', system-ui, sans-serif;
 }
@@ -33,8 +49,72 @@ html {
 }
 
 body {
-  background-color: var(--color-gray-50);
-  color: var(--color-gray-900);
+  background-color: var(--color-dark-950);
+  color: var(--color-dark-100);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-dark-900);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-dark-600);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-dark-500);
+}
+
+/* Selection color */
+::selection {
+  background-color: var(--color-primary-500);
+  color: var(--color-dark-950);
+}
+
+/* Glass morphism utility */
+.glass {
+  background: rgba(17, 24, 39, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-light {
+  background: rgba(31, 41, 55, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Gradient backgrounds */
+.bg-gradient-dark {
+  background: linear-gradient(180deg, var(--color-dark-900) 0%, var(--color-dark-950) 100%);
+}
+
+.bg-gradient-card {
+  background: linear-gradient(145deg, var(--color-dark-800) 0%, var(--color-dark-900) 100%);
+}
+
+/* Subtle glow effects */
+.glow-primary {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
+}
+
+.glow-secondary {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+}
+
+/* Text gradient */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-primary-600) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

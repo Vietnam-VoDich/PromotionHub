@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npm run db:generate:*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker compose:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run lint:*)",
+      "Bash(brew services:*)",
+      "Bash(brew install:*)",
+      "Bash(docker:*)",
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(npm run dev:*)",
+      "Bash(curl:*)",
+      "Bash(open http://localhost:3000/api/docs)",
+      "Bash(npm run lint:fix:*)",
+      "Bash(__NEW_LINE_f28efc5b69611b46__ echo \"\")",
+      "Bash(npm create:*)",
+      "WebSearch",
+      "WebFetch(domain:www.blipbillboards.com)"
+    ]
+  }
+}

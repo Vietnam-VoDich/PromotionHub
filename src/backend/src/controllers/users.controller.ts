@@ -35,7 +35,7 @@ export const usersController = {
     next: NextFunction
   ): Promise<void> {
     try {
-      const user = (req as Request & { user: AuthUser }).user;
+      const user = (req as unknown as Request & { user: AuthUser }).user;
       const result = await usersService.updateUser(req.params.id, req.body, user.userId, user.role);
       res.json(result);
     } catch (error) {

@@ -63,7 +63,7 @@ enum VerificationStatus {
 model User {
   id              String   @id @default(uuid())
   email           String   @unique
-  passwordHash    String   @map("password_hash")
+  passwordHash    String?  @map("password_hash")
   role            Role     @default(advertiser)
   firstName       String?  @map("first_name")
   lastName        String?  @map("last_name")
@@ -74,6 +74,13 @@ model User {
   emailVerified   Boolean  @default(false) @map("email_verified")
   emailVerifyToken String? @map("email_verify_token")
   newsletterOptIn Boolean  @default(true) @map("newsletter_opt_in")
+
+  // OAuth providers
+  googleId        String?  @unique @map("google_id")
+  facebookId      String?  @unique @map("facebook_id")
+  appleId         String?  @unique @map("apple_id")
+  authProvider    String?  @map("auth_provider") // 'email' | 'google' | 'facebook' | 'apple'
+
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
@@ -86,6 +93,7 @@ model User {
   verificationPhotos VerificationPhoto[]
   refreshTokens      RefreshToken[]
   pushSubscriptions  PushSubscription[]
+  favorites          Favorite[]
 
   @@index([email])
   @@index([role])
@@ -123,11 +131,21 @@ model Listing {
   createdAt         DateTime      @default(now()) @map("created_at")
   updatedAt         DateTime      @updatedAt @map("updated_at")
 
+  // Traffic data
+  dailyTraffic      Int?          @map("daily_traffic") // estimated daily vehicles/pedestrians
+  peakHours         String?       @map("peak_hours") // JSON: ["07:00-09:00", "17:00-19:00"]
+  trafficSource     String?       @map("traffic_source") // source of traffic data
+  trafficUpdatedAt  DateTime?     @map("traffic_updated_at")
+
+  // Advertiser history
+  pastAdvertisers   String?       @map("past_advertisers") // JSON array of brand names
+
   // relations
-  owner    User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  photos   ListingPhoto[]
-  bookings Booking[]
-  reviews  Review[]
+  owner     User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  photos    ListingPhoto[]
+  bookings  Booking[]
+  reviews   Review[]
+  favorites Favorite[]
 
   @@index([ownerId])
   @@index([status])
@@ -164,6 +182,12 @@ model Booking {
   createdAt        DateTime      @default(now()) @map("created_at")
   updatedAt        DateTime      @updatedAt @map("updated_at")
 
+  // Blockchain certification
+  blockchainHash   String?       @map("blockchain_hash")
+  blockchainTxId   String?       @map("blockchain_tx_id")
+  blockchainNetwork String?      @map("blockchain_network")
+  certifiedAt      DateTime?     @map("certified_at")
+
   // relations
   listing            Listing             @relation(fields: [listingId], references: [id], onDelete: Cascade)
   advertiser         User                @relation("AdvertiserBookings", fields: [advertiserId], references: [id], onDelete: Cascade)
@@ -175,6 +199,7 @@ model Booking {
   @@index([advertiserId])
   @@index([status])
   @@index([createdAt])
+  @@index([blockchainHash])
   @@map("bookings")
 }
 
@@ -268,6 +293,25 @@ model PushSubscription {
 }
 
 // ============================================
+// FAVORITES
+// ============================================
+
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  listingId String   @map("listing_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@index([userId])
+  @@index([listingId])
+  @@map("favorites")
+}
+
+// ============================================
 // NEWSLETTER
 // ============================================
 
@@ -312,4 +356,110 @@ enum CampaignStatus {
   sending
   sent
   cancelled
+}
+
+// ============================================
+// BLOG (SEO)
+// ============================================
+
+model BlogPost {
+  id              String      @id @default(uuid())
+  slug            String      @unique
+  title           String
+  excerpt         String?     @db.Text
+  content         String      @db.Text
+  coverImage      String?     @map("cover_image")
+  authorId        String?     @map("author_id")
+  authorName      String?     @map("author_name")
+  status          PostStatus  @default(draft)
+  publishedAt     DateTime?   @map("published_at")
+  viewCount       Int         @default(0) @map("view_count")
+
+  // SEO fields
+  metaTitle       String?     @map("meta_title")
+  metaDescription String?     @map("meta_description") @db.Text
+  metaKeywords    String?     @map("meta_keywords")
+  canonicalUrl    String?     @map("canonical_url")
+  ogImage         String?     @map("og_image")
+
+  // Structured data
+  readingTime     Int?        @map("reading_time") // in minutes
+  featured        Boolean     @default(false)
+
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  categories      BlogCategory[]  @relation("PostCategories")
+  tags            BlogTag[]       @relation("PostTags")
+
+  @@index([slug])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([featured])
+  @@map("blog_posts")
+}
+
+model BlogCategory {
+  id          String     @id @default(uuid())
+  slug        String     @unique
+  name        String
+  description String?    @db.Text
+  parentId    String?    @map("parent_id")
+  order       Int        @default(0)
+  createdAt   DateTime   @default(now()) @map("created_at")
+
+  posts       BlogPost[] @relation("PostCategories")
+
+  @@index([slug])
+  @@index([parentId])
+  @@map("blog_categories")
+}
+
+model BlogTag {
+  id        String     @id @default(uuid())
+  slug      String     @unique
+  name      String
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  posts     BlogPost[] @relation("PostTags")
+
+  @@index([slug])
+  @@map("blog_tags")
+}
+
+enum PostStatus {
+  draft
+  published
+  archived
+}
+
+// ============================================
+// BLOCKCHAIN CERTIFICATION
+// ============================================
+
+model BlockchainCertification {
+  id              String   @id @default(uuid())
+  entityType      String   @map("entity_type") // 'booking', 'verification', 'payment'
+  entityId        String   @map("entity_id")
+  dataHash        String   @map("data_hash") // SHA256 hash of the data
+  transactionHash String?  @map("transaction_hash") // blockchain tx hash
+  blockNumber     Int?     @map("block_number")
+  network         String   @default("polygon") // polygon, ethereum, etc.
+  status          CertificationStatus @default(pending)
+  metadata        String?  @db.Text // JSON metadata
+  createdAt       DateTime @default(now()) @map("created_at")
+  certifiedAt     DateTime? @map("certified_at")
+
+  @@unique([entityType, entityId])
+  @@index([dataHash])
+  @@index([transactionHash])
+  @@index([status])
+  @@map("blockchain_certifications")
+}
+
+enum CertificationStatus {
+  pending
+  submitted
+  confirmed
+  failed
 }

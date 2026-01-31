@@ -127,6 +127,7 @@ export const authService = {
         city: input.city,
         emailVerifyToken,
         newsletterOptIn: input.newsletterOptIn ?? true,
+        authProvider: 'email',
       },
       select: {
         id: true,
@@ -177,6 +178,11 @@ export const authService = {
 
     if (!user) {
       throw new UnauthorizedError('Invalid email or password');
+    }
+
+    // OAuth users without password can't login with email/password
+    if (!user.passwordHash) {
+      throw new UnauthorizedError(`Ce compte utilise ${user.authProvider || 'un autre provider'}. Connectez-vous avec ${user.authProvider || 'le bon provider'}.`);
     }
 
     const isPasswordValid = await bcrypt.compare(input.password, user.passwordHash);
@@ -406,5 +412,36 @@ export const authService = {
     await prisma.refreshToken.deleteMany({
       where: { userId: user.id },
     });
+  },
+
+  /**
+   * Generate tokens for OAuth user (used after OAuth callback)
+   */
+  async generateTokensForUser(userId: string): Promise<AuthTokens> {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    const tokens = generateTokens({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
+    // store refresh token
+    const expiresAt = new Date(Date.now() + parseExpiresIn(REFRESH_TOKEN_EXPIRES_IN));
+    await prisma.refreshToken.create({
+      data: {
+        token: tokens.refreshToken,
+        userId: user.id,
+        expiresAt,
+      },
+    });
+
+    return tokens;
   },
 };

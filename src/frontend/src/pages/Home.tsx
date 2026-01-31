@@ -3,13 +3,12 @@ import { Link } from 'react-router-dom';
 import {
   Search, MapPin, Shield, TrendingUp, ArrowRight, Star,
   CheckCircle, Users, Clock, Camera, MessageCircle, CreditCard,
-  ChevronLeft, ChevronRight, Quote
+  ChevronLeft, ChevronRight, Quote, Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { QUARTIERS } from '@/lib/utils';
 
-// Images d'Abidjan - Photos réelles de la ville (Pexels & Unsplash)
 const heroImages = [
   {
     id: 1,
@@ -45,17 +44,15 @@ const heroImages = [
   },
 ];
 
-// Catégories de panneaux
 const categories = [
-  { id: 'visibility', label: 'Haute Visibilité', icon: '👁️', color: 'bg-orange-500', count: 124 },
-  { id: 'premium', label: 'Premium', icon: '⭐', color: 'bg-amber-500', count: 45 },
-  { id: 'budget', label: 'Budget', icon: '💰', color: 'bg-green-500', count: 89 },
-  { id: 'center', label: 'Centre-ville', icon: '🏙️', color: 'bg-blue-500', count: 67 },
-  { id: 'axes', label: 'Axes Express', icon: '🛣️', color: 'bg-purple-500', count: 156 },
-  { id: 'digital', label: 'Digital', icon: '📺', color: 'bg-pink-500', count: 23 },
+  { id: 'visibility', label: 'Haute Visibilité', icon: '👁️', color: 'from-orange-500 to-amber-500', count: 124 },
+  { id: 'premium', label: 'Premium', icon: '⭐', color: 'from-amber-500 to-yellow-500', count: 45 },
+  { id: 'budget', label: 'Budget', icon: '💰', color: 'from-emerald-500 to-green-500', count: 89 },
+  { id: 'center', label: 'Centre-ville', icon: '🏙️', color: 'from-blue-500 to-cyan-500', count: 67 },
+  { id: 'axes', label: 'Axes Express', icon: '🛣️', color: 'from-purple-500 to-violet-500', count: 156 },
+  { id: 'digital', label: 'Digital', icon: '📺', color: 'from-pink-500 to-rose-500', count: 23 },
 ];
 
-// Stats animées
 const stats = [
   { value: 500, suffix: '+', label: 'Panneaux disponibles', icon: MapPin },
   { value: 1200, suffix: '+', label: 'Campagnes réalisées', icon: TrendingUp },
@@ -63,7 +60,6 @@ const stats = [
   { value: 10, suffix: '', label: 'Quartiers couverts', icon: Users },
 ];
 
-// Panneaux en vedette (Featured) - Photos réelles d'Afrique de l'Ouest
 const featuredListings = [
   {
     id: '1',
@@ -115,7 +111,6 @@ const featuredListings = [
   },
 ];
 
-// Témoignages
 const testimonials = [
   {
     id: 1,
@@ -143,7 +138,6 @@ const testimonials = [
   },
 ];
 
-// Images et données par quartier - Photos d'Abidjan et Afrique de l'Ouest (Pexels)
 const quartierData: Record<string, { image: string; count: number }> = {
   'Plateau': { image: 'https://images.pexels.com/photos/7381783/pexels-photo-7381783.jpeg?auto=compress&cs=tinysrgb&w=600', count: 87 },
   'Cocody': { image: 'https://images.pexels.com/photos/7381786/pexels-photo-7381786.jpeg?auto=compress&cs=tinysrgb&w=600', count: 124 },
@@ -157,7 +151,6 @@ const quartierData: Record<string, { image: string; count: number }> = {
   'Bingerville': { image: 'https://images.pexels.com/photos/2901209/pexels-photo-2901209.jpeg?auto=compress&cs=tinysrgb&w=600', count: 12 },
 };
 
-// Animated Counter Component
 function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
   const [count, setCount] = useState(0);
   const [hasAnimated, setHasAnimated] = useState(false);
@@ -205,7 +198,6 @@ export function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  // Auto-slide carousel
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroImages.length);
@@ -221,9 +213,9 @@ export function Home() {
   };
 
   return (
-    <div className="overflow-x-hidden">
-      {/* ============ HERO SECTION - Immersif avec Carrousel ============ */}
-      <section className="relative h-[90vh] min-h-[700px] overflow-hidden bg-gray-900">
+    <div className="overflow-x-hidden bg-dark-950">
+      {/* HERO SECTION */}
+      <section className="relative h-[90vh] min-h-[700px] overflow-hidden">
         {/* Background Carousel */}
         <div className="absolute inset-0">
           {heroImages.map((image, index) => (
@@ -238,7 +230,7 @@ export function Home() {
                 alt={image.title}
                 className="h-full w-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
+              <div className="absolute inset-0 bg-gradient-to-b from-dark-950/70 via-dark-950/40 to-dark-950" />
             </div>
           ))}
         </div>
@@ -246,13 +238,13 @@ export function Home() {
         {/* Navigation Arrows */}
         <button
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/20 p-3 backdrop-blur-sm transition hover:bg-white/30"
+          className="absolute left-4 top-1/2 z-20 -translate-y-1/2 rounded-xl bg-dark-800/80 p-3 backdrop-blur-sm transition hover:bg-dark-700"
         >
           <ChevronLeft className="h-6 w-6 text-white" />
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/20 p-3 backdrop-blur-sm transition hover:bg-white/30"
+          className="absolute right-4 top-1/2 z-20 -translate-y-1/2 rounded-xl bg-dark-800/80 p-3 backdrop-blur-sm transition hover:bg-dark-700"
         >
           <ChevronRight className="h-6 w-6 text-white" />
         </button>
@@ -260,37 +252,38 @@ export function Home() {
         {/* Hero Content */}
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-4">
           {/* Badge */}
-          <div className="mb-6 rounded-full bg-white/10 px-4 py-2 backdrop-blur-sm">
-            <span className="text-sm font-medium text-white">
-              🇨🇮 La 1ère marketplace de panneaux publicitaires en Côte d'Ivoire
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary-500/20 px-4 py-2 backdrop-blur-sm border border-primary-500/30">
+            <Sparkles className="h-4 w-4 text-primary-400" />
+            <span className="text-sm font-medium text-primary-300">
+              La 1ère marketplace de panneaux publicitaires en Côte d'Ivoire
             </span>
           </div>
 
           {/* Main Title */}
           <h1 className="mb-6 text-center text-4xl font-bold text-white drop-shadow-lg md:text-5xl lg:text-7xl">
             Trouvez l'emplacement
-            <span className="mt-2 block bg-gradient-to-r from-primary-400 to-primary-300 bg-clip-text text-transparent">
+            <span className="mt-2 block bg-gradient-to-r from-primary-400 via-primary-300 to-primary-500 bg-clip-text text-transparent">
               parfait pour votre pub
             </span>
           </h1>
 
           {/* Subtitle */}
-          <p className="mb-10 max-w-2xl text-center text-lg text-white/90 md:text-xl">
+          <p className="mb-10 max-w-2xl text-center text-lg text-dark-200 md:text-xl">
             Réservez des panneaux publicitaires à Abidjan en quelques clics.
             Paiement sécurisé, vérification garantie.
           </p>
 
           {/* Search Bar */}
           <div className="mb-8 w-full max-w-3xl">
-            <div className="flex flex-col gap-3 rounded-2xl bg-white p-3 shadow-2xl sm:flex-row sm:rounded-full">
+            <div className="flex flex-col gap-3 rounded-2xl bg-dark-800/90 backdrop-blur-md p-3 shadow-2xl border border-dark-700/50 sm:flex-row sm:rounded-full">
               <div className="flex flex-1 items-center gap-3 px-4">
-                <Search className="h-5 w-5 text-gray-400" />
+                <Search className="h-5 w-5 text-dark-400" />
                 <input
                   type="text"
                   placeholder="Rechercher par quartier, type de panneau..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 border-0 bg-transparent py-3 text-gray-900 placeholder-gray-500 focus:outline-none"
+                  className="flex-1 border-0 bg-transparent py-3 text-white placeholder-dark-400 focus:outline-none"
                 />
               </div>
               <Link to={`/listings${searchQuery ? `?q=${searchQuery}` : ''}`}>
@@ -312,8 +305,8 @@ export function Home() {
                 )}
                 className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all sm:px-5 sm:py-2.5 ${
                   selectedCategory === category.id
-                    ? `${category.color} text-white shadow-lg scale-105`
-                    : 'bg-white/90 text-gray-700 hover:bg-white hover:shadow-md'
+                    ? `bg-gradient-to-r ${category.color} text-white shadow-lg scale-105`
+                    : 'bg-dark-800/80 text-dark-200 hover:bg-dark-700 border border-dark-700/50'
                 }`}
               >
                 <span>{category.icon}</span>
@@ -326,12 +319,12 @@ export function Home() {
           {/* Quick Links */}
           <div className="flex gap-4">
             <Link to="/listings">
-              <Button variant="outline" className="border-white/50 text-white hover:bg-white/10">
+              <Button variant="outline" size="lg">
                 Voir tous les panneaux
               </Button>
             </Link>
             <Link to="/signup?role=owner">
-              <Button variant="ghost" className="text-white hover:bg-white/10">
+              <Button variant="ghost" size="lg" className="text-dark-200 hover:text-white">
                 Proposer mon panneau
               </Button>
             </Link>
@@ -346,17 +339,17 @@ export function Home() {
               onClick={() => setCurrentSlide(index)}
               className={`h-2 rounded-full transition-all ${
                 index === currentSlide
-                  ? 'w-8 bg-white'
-                  : 'w-2 bg-white/50 hover:bg-white/75'
+                  ? 'w-8 bg-primary-400'
+                  : 'w-2 bg-dark-500 hover:bg-dark-400'
               }`}
             />
           ))}
         </div>
 
         {/* Current Slide Info */}
-        <div className="absolute bottom-8 right-8 z-10 hidden rounded-xl bg-black/50 p-4 backdrop-blur-sm lg:block">
+        <div className="absolute bottom-8 right-8 z-10 hidden rounded-xl bg-dark-800/90 backdrop-blur-md p-4 border border-dark-700/50 lg:block">
           <p className="font-semibold text-white">{heroImages[currentSlide].title}</p>
-          <p className="flex items-center gap-1 text-sm text-white/80">
+          <p className="flex items-center gap-1 text-sm text-dark-300">
             <MapPin className="h-3 w-3" />
             {heroImages[currentSlide].location}
           </p>
@@ -364,43 +357,43 @@ export function Home() {
             <span className="text-lg font-bold text-primary-400">
               {heroImages[currentSlide].price}
             </span>
-            <span className="rounded bg-white/20 px-2 py-1 text-xs text-white">
+            <span className="rounded-lg bg-dark-700 px-2 py-1 text-xs text-dark-200">
               {heroImages[currentSlide].size}
             </span>
           </div>
         </div>
       </section>
 
-      {/* ============ STATS SECTION ============ */}
+      {/* STATS SECTION */}
       <section className="relative -mt-16 z-20 mx-4 lg:mx-auto lg:max-w-6xl">
-        <div className="grid grid-cols-2 gap-4 rounded-2xl bg-white p-6 shadow-xl md:grid-cols-4 md:gap-8 md:p-8">
+        <div className="grid grid-cols-2 gap-4 rounded-2xl bg-dark-800/90 backdrop-blur-md p-6 shadow-xl border border-dark-700/50 md:grid-cols-4 md:gap-8 md:p-8">
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
-              <div className="mb-2 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-100">
-                <stat.icon className="h-6 w-6 text-primary-600" />
+              <div className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500/20 to-primary-600/20 border border-primary-500/30">
+                <stat.icon className="h-6 w-6 text-primary-400" />
               </div>
-              <div className="text-2xl font-bold text-gray-900 md:text-3xl">
+              <div className="text-2xl font-bold text-white md:text-3xl">
                 <AnimatedCounter value={stat.value} suffix={stat.suffix} />
               </div>
-              <div className="text-sm text-gray-600">{stat.label}</div>
+              <div className="text-sm text-dark-400">{stat.label}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ============ FEATURED LISTINGS ============ */}
+      {/* FEATURED LISTINGS */}
       <section className="py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 flex items-end justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
+              <h2 className="text-3xl font-bold text-white md:text-4xl">
                 Panneaux en vedette
               </h2>
-              <p className="mt-2 text-gray-600">
+              <p className="mt-2 text-dark-400">
                 Les emplacements les plus populaires à Abidjan
               </p>
             </div>
-            <Link to="/listings" className="hidden items-center gap-2 text-primary-600 hover:text-primary-700 sm:flex">
+            <Link to="/listings" className="hidden items-center gap-2 text-primary-400 hover:text-primary-300 sm:flex">
               Voir tout
               <ArrowRight className="h-4 w-4" />
             </Link>
@@ -411,7 +404,7 @@ export function Home() {
               <Link
                 key={listing.id}
                 to={`/listings/${listing.id}`}
-                className="group overflow-hidden rounded-2xl bg-white shadow-md transition-all hover:shadow-xl"
+                className="group overflow-hidden rounded-2xl bg-dark-800 border border-dark-700/50 transition-all hover:border-dark-600 hover:shadow-xl hover:shadow-dark-950/50"
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img
@@ -420,14 +413,14 @@ export function Home() {
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                   {listing.verified && (
-                    <div className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-green-500 px-2 py-1 text-xs font-medium text-white">
+                    <div className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-emerald-500/90 backdrop-blur-sm px-2 py-1 text-xs font-medium text-white">
                       <CheckCircle className="h-3 w-3" />
                       Vérifié
                     </div>
                   )}
                   {!listing.available && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                      <span className="rounded-full bg-red-500 px-4 py-2 text-sm font-medium text-white">
+                    <div className="absolute inset-0 flex items-center justify-center bg-dark-950/60 backdrop-blur-sm">
+                      <span className="rounded-full bg-red-500/90 px-4 py-2 text-sm font-medium text-white">
                         Réservé
                       </span>
                     </div>
@@ -435,26 +428,26 @@ export function Home() {
                 </div>
                 <div className="p-4">
                   <div className="mb-2 flex items-center justify-between">
-                    <span className="flex items-center gap-1 text-sm text-gray-500">
+                    <span className="flex items-center gap-1 text-sm text-dark-400">
                       <MapPin className="h-4 w-4" />
                       {listing.location}
                     </span>
-                    <span className="rounded bg-gray-100 px-2 py-1 text-xs text-gray-600">
+                    <span className="rounded-lg bg-dark-700 px-2 py-1 text-xs text-dark-300">
                       {listing.size}
                     </span>
                   </div>
-                  <h3 className="mb-2 font-semibold text-gray-900 group-hover:text-primary-600">
+                  <h3 className="mb-2 font-semibold text-white group-hover:text-primary-400 transition-colors">
                     {listing.title}
                   </h3>
                   <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-primary-600">
+                    <span className="text-lg font-bold text-primary-400">
                       {formatPrice(listing.price)}
-                      <span className="text-sm font-normal text-gray-500">/mois</span>
+                      <span className="text-sm font-normal text-dark-500">/mois</span>
                     </span>
                     <div className="flex items-center gap-1 text-sm">
                       <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                      <span className="font-medium">{listing.rating}</span>
-                      <span className="text-gray-400">({listing.reviews})</span>
+                      <span className="font-medium text-white">{listing.rating}</span>
+                      <span className="text-dark-500">({listing.reviews})</span>
                     </div>
                   </div>
                 </div>
@@ -473,14 +466,14 @@ export function Home() {
         </div>
       </section>
 
-      {/* ============ QUARTIERS AVEC IMAGES ============ */}
-      <section className="bg-gray-50 py-16 lg:py-24">
+      {/* QUARTIERS */}
+      <section className="py-16 lg:py-24 bg-dark-900/50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
+            <h2 className="text-3xl font-bold text-white md:text-4xl">
               Explorez par quartier
             </h2>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 text-dark-400">
               Découvrez les emplacements disponibles dans chaque zone d'Abidjan
             </p>
           </div>
@@ -497,10 +490,10 @@ export function Home() {
                   alt={quartier}
                   className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/30 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
                   <h3 className="text-lg font-bold text-white">{quartier}</h3>
-                  <p className="text-sm text-white/80">
+                  <p className="text-sm text-dark-300">
                     {quartierData[quartier]?.count || 0} panneaux
                   </p>
                 </div>
@@ -510,14 +503,14 @@ export function Home() {
         </div>
       </section>
 
-      {/* ============ COMMENT CA MARCHE ============ */}
+      {/* COMMENT CA MARCHE */}
       <section className="py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
+            <h2 className="text-3xl font-bold text-white md:text-4xl">
               Comment ça marche ?
             </h2>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 text-dark-400">
               Réservez votre espace publicitaire en 3 étapes simples
             </p>
           </div>
@@ -529,37 +522,37 @@ export function Home() {
                 icon: Search,
                 title: 'Trouvez votre panneau',
                 description: 'Parcourez notre catalogue de panneaux par quartier, taille ou budget. Filtrez selon vos besoins.',
-                color: 'bg-primary-500',
+                gradient: 'from-primary-500 to-orange-500',
               },
               {
                 step: 2,
                 icon: CreditCard,
                 title: 'Réservez en ligne',
                 description: 'Choisissez vos dates, validez le contrat et payez en toute sécurité via Mobile Money ou carte.',
-                color: 'bg-secondary-500',
+                gradient: 'from-secondary-500 to-emerald-500',
               },
               {
                 step: 3,
                 icon: Camera,
                 title: 'Vérifiez votre affichage',
                 description: 'Recevez une photo de preuve que votre publicité est bien affichée. Suivi garanti.',
-                color: 'bg-blue-500',
+                gradient: 'from-blue-500 to-cyan-500',
               },
             ].map((item) => (
               <div key={item.step} className="relative text-center">
                 {item.step < 3 && (
-                  <div className="absolute left-1/2 top-12 hidden h-0.5 w-full bg-gray-200 md:block" />
+                  <div className="absolute left-1/2 top-14 hidden h-0.5 w-full bg-dark-700 md:block" />
                 )}
-                <div className={`relative mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full ${item.color}`}>
-                  <item.icon className="h-10 w-10 text-white" />
-                  <div className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-sm font-bold text-white">
+                <div className={`relative mx-auto mb-6 flex h-28 w-28 items-center justify-center rounded-2xl bg-gradient-to-br ${item.gradient} shadow-lg`}>
+                  <item.icon className="h-12 w-12 text-white" />
+                  <div className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-dark-800 text-sm font-bold text-white border-2 border-dark-700">
                     {item.step}
                   </div>
                 </div>
-                <h3 className="mb-3 text-xl font-semibold text-gray-900">
+                <h3 className="mb-3 text-xl font-semibold text-white">
                   {item.title}
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-dark-400">
                   {item.description}
                 </p>
               </div>
@@ -568,68 +561,74 @@ export function Home() {
         </div>
       </section>
 
-      {/* ============ FEATURES / AVANTAGES ============ */}
-      <section className="bg-gray-900 py-16 lg:py-24">
+      {/* FEATURES */}
+      <section className="py-16 lg:py-24 bg-dark-900/50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold text-white md:text-4xl">
               Pourquoi choisir PromotionHub ?
             </h2>
-            <p className="mt-2 text-gray-400">
+            <p className="mt-2 text-dark-400">
               La solution complète pour votre publicité extérieure
             </p>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[
               {
                 icon: Search,
                 title: 'Recherche intelligente',
                 description: 'Filtres avancés par quartier, taille, prix et disponibilité. Trouvez le panneau parfait en quelques secondes.',
-                color: 'text-primary-400',
+                gradient: 'from-primary-500/20 to-orange-500/20',
+                iconColor: 'text-primary-400',
               },
               {
                 icon: Shield,
                 title: 'Paiement sécurisé',
                 description: 'Orange Money, MTN Mobile Money ou carte bancaire. Votre argent est protégé jusqu\'à validation.',
-                color: 'text-green-400',
+                gradient: 'from-emerald-500/20 to-green-500/20',
+                iconColor: 'text-emerald-400',
               },
               {
                 icon: Camera,
                 title: 'Vérification photo',
                 description: 'Recevez une preuve photo que votre publicité est bien affichée. Transparence totale.',
-                color: 'text-blue-400',
+                gradient: 'from-blue-500/20 to-cyan-500/20',
+                iconColor: 'text-blue-400',
               },
               {
                 icon: MessageCircle,
                 title: 'Chat intégré',
                 description: 'Communiquez directement avec les propriétaires. Négociez et posez vos questions.',
-                color: 'text-purple-400',
+                gradient: 'from-purple-500/20 to-violet-500/20',
+                iconColor: 'text-purple-400',
               },
               {
                 icon: TrendingUp,
                 title: 'Analytics en temps réel',
                 description: 'Suivez vos campagnes, visualisez les performances et optimisez votre ROI.',
-                color: 'text-amber-400',
+                gradient: 'from-amber-500/20 to-yellow-500/20',
+                iconColor: 'text-amber-400',
               },
               {
                 icon: Clock,
                 title: 'Réservation instantanée',
                 description: 'Réservez 24h/24, 7j/7. Confirmation immédiate, contrat digital automatique.',
-                color: 'text-cyan-400',
+                gradient: 'from-cyan-500/20 to-teal-500/20',
+                iconColor: 'text-cyan-400',
               },
             ].map((feature, index) => (
               <div
                 key={index}
-                className="rounded-2xl border border-gray-800 bg-gray-800/50 p-8 transition-all hover:border-gray-700 hover:bg-gray-800"
+                className="rounded-2xl border border-dark-700/50 bg-dark-800/50 p-8 transition-all hover:border-dark-600 hover:bg-dark-800"
               >
-                <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gray-700 ${feature.color}`}>
-                  <feature.icon className="h-6 w-6" />
+                <div className={`mb-4 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br ${feature.gradient} border border-dark-700/50 ${feature.iconColor}`}>
+                  <feature.icon className="h-7 w-7" />
                 </div>
                 <h3 className="mb-3 text-xl font-semibold text-white">
                   {feature.title}
                 </h3>
-                <p className="text-gray-400">
+                <p className="text-dark-400">
                   {feature.description}
                 </p>
               </div>
@@ -638,14 +637,14 @@ export function Home() {
         </div>
       </section>
 
-      {/* ============ TESTIMONIALS ============ */}
+      {/* TESTIMONIALS */}
       <section className="py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
+            <h2 className="text-3xl font-bold text-white md:text-4xl">
               Ils nous font confiance
             </h2>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 text-dark-400">
               Découvrez ce que nos clients disent de PromotionHub
             </p>
           </div>
@@ -658,19 +657,19 @@ export function Home() {
                     <Star key={i} className="h-5 w-5 fill-amber-400 text-amber-400" />
                   ))}
                 </div>
-                <Quote className="mb-4 h-8 w-8 text-primary-200" />
-                <p className="mb-6 text-gray-600">
+                <Quote className="mb-4 h-8 w-8 text-primary-500/30" />
+                <p className="mb-6 text-dark-300">
                   "{testimonial.content}"
                 </p>
                 <div className="flex items-center gap-4">
                   <img
                     src={testimonial.avatar}
                     alt={testimonial.name}
-                    className="h-12 w-12 rounded-full object-cover"
+                    className="h-12 w-12 rounded-full object-cover ring-2 ring-dark-700"
                   />
                   <div>
-                    <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
-                    <p className="text-sm text-gray-500">{testimonial.role}</p>
+                    <h4 className="font-semibold text-white">{testimonial.name}</h4>
+                    <p className="text-sm text-dark-400">{testimonial.role}</p>
                   </div>
                 </div>
               </Card>
@@ -679,34 +678,50 @@ export function Home() {
         </div>
       </section>
 
-      {/* ============ CTA FINAL ============ */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 to-primary-800 py-16 lg:py-24">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }} />
+      {/* CTA FINAL */}
+      <section className="relative overflow-hidden py-16 lg:py-24">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/20 via-dark-900 to-primary-800/20" />
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary-500/10 via-transparent to-transparent" />
         </div>
         <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary-500/20 px-4 py-2 border border-primary-500/30">
+            <Sparkles className="h-4 w-4 text-primary-400" />
+            <span className="text-sm font-medium text-primary-300">Commencez gratuitement</span>
+          </div>
           <h2 className="mb-4 text-3xl font-bold text-white md:text-5xl">
             Prêt à booster votre visibilité ?
           </h2>
-          <p className="mb-8 text-lg text-primary-100 md:text-xl">
+          <p className="mb-8 text-lg text-dark-300 md:text-xl">
             Rejoignez des centaines d'annonceurs qui font confiance à PromotionHub
             pour leurs campagnes publicitaires à Abidjan.
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link to="/signup">
-              <Button size="lg" className="bg-white text-primary-700 hover:bg-gray-100">
+              <Button size="lg">
                 Créer mon compte gratuit
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
             <Link to="/listings">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+              <Button size="lg" variant="outline">
                 Explorer les panneaux
               </Button>
             </Link>
           </div>
-          <p className="mt-6 text-sm text-primary-200">
-            ✓ Inscription gratuite &nbsp;&nbsp; ✓ Pas de frais cachés &nbsp;&nbsp; ✓ Support 24/7
+          <p className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-dark-400">
+            <span className="flex items-center gap-1">
+              <CheckCircle className="h-4 w-4 text-emerald-400" />
+              Inscription gratuite
+            </span>
+            <span className="flex items-center gap-1">
+              <CheckCircle className="h-4 w-4 text-emerald-400" />
+              Pas de frais cachés
+            </span>
+            <span className="flex items-center gap-1">
+              <CheckCircle className="h-4 w-4 text-emerald-400" />
+              Support 24/7
+            </span>
           </p>
         </div>
       </section>

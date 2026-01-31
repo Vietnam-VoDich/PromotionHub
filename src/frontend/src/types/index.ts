@@ -47,6 +47,13 @@ export interface Listing {
     email: string;
     phone: string | null;
   };
+  // Traffic data
+  dailyTraffic: number | null;
+  peakHours: string | null; // JSON string array
+  trafficSource: string | null;
+  trafficUpdatedAt: string | null;
+  // Advertiser history
+  pastAdvertisers: string | null; // JSON string array
 }
 
 export interface Booking {
@@ -58,6 +65,11 @@ export interface Booking {
   contractUrl: string | null;
   contractSignedAt: string | null;
   createdAt: string;
+  // Blockchain certification
+  blockchainHash: string | null;
+  blockchainTxId: string | null;
+  blockchainNetwork: string | null;
+  certifiedAt: string | null;
   listing: {
     id: string;
     title: string;
@@ -159,4 +171,34 @@ export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
   user: User;
+}
+
+// Blockchain types
+export type CertificationStatus = 'pending' | 'submitted' | 'confirmed' | 'failed';
+
+export interface BlockchainCertification {
+  hash: string;
+  transactionHash: string | null;
+  blockNumber: number | null;
+  network: string;
+  timestamp: string;
+  explorerUrl: string | null;
+}
+
+export interface BlockchainVerification {
+  valid: boolean;
+  certification: BlockchainCertification | null;
+  currentHash: string | null;
+  message: string;
+}
+
+export interface BlockchainInfo {
+  network: string;
+  enabled: boolean;
+  features: {
+    hashCertification: boolean;
+    onChainStorage: boolean;
+    verificationProof: boolean;
+  };
+  description: string;
 }

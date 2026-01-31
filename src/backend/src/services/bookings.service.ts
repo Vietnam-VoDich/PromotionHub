@@ -15,6 +15,11 @@ const bookingSelect = {
   contractSignedAt: true,
   createdAt: true,
   updatedAt: true,
+  // Blockchain certification
+  blockchainHash: true,
+  blockchainTxId: true,
+  blockchainNetwork: true,
+  certifiedAt: true,
   listing: {
     select: {
       id: true,

@@ -1,12 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Search, Send, MoreVertical, Check, CheckCheck,
   MessageSquare, Clock, Loader2, ArrowLeft
 } from 'lucide-react';
 import { messagesApi } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
+import { useSocketContext } from '@/context/SocketContext';
 import { formatDistanceToNow, cn } from '@/lib/utils';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -17,10 +18,23 @@ export function Messages() {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const {
+    sendMessage,
+    markConversationAsRead,
+    startTyping,
+    stopTyping,
+    checkPresence,
+    typingUsers,
+    presenceState,
+    on,
+  } = useSocketContext();
 
   const activeUserId = searchParams.get('user');
   const [searchQuery, setSearchQuery] = useState('');
   const [newMessage, setNewMessage] = useState('');
+  const [isSending, setIsSending] = useState(false);
 
   const { data: conversations, isLoading: loadingConversations } = useQuery({
     queryKey: ['conversations'],
@@ -35,39 +49,69 @@ export function Messages() {
 
   const messages = messagesData?.data || [];
 
-  const sendMessageMutation = useMutation({
-    mutationFn: (content: string) =>
-      messagesApi.send(activeUserId!, content),
-    onSuccess: () => {
-      setNewMessage('');
-      queryClient.invalidateQueries({ queryKey: ['messages', activeUserId] });
-      queryClient.invalidateQueries({ queryKey: ['conversations'] });
-    },
-  });
-
   const activeConversation = conversations?.find(
     (c) => c.user.id === activeUserId
   );
 
-  // Scroll to bottom when messages change
+  // check presence for all conversation partners
+  useEffect(() => {
+    if (conversations?.length) {
+      checkPresence(conversations.map((c) => c.user.id));
+    }
+  }, [conversations, checkPresence]);
+
+  // listen for new messages via WebSocket
+  useEffect(() => {
+    const unsubscribe = on<Message>('message:new', (msg) => {
+      queryClient.invalidateQueries({ queryKey: ['messages', msg.sender?.id] });
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+    });
+    return unsubscribe;
+  }, [on, queryClient]);
+
+  // listen for sent message confirmation
+  useEffect(() => {
+    const unsubscribe = on<Message>('message:sent', () => {
+      setIsSending(false);
+      queryClient.invalidateQueries({ queryKey: ['messages', activeUserId] });
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+    });
+    return unsubscribe;
+  }, [on, queryClient, activeUserId]);
+
+  // scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Mark messages as read
+  // mark messages as read via WebSocket
   useEffect(() => {
-    if (activeUserId && messages?.length) {
-      const unreadMessages = messages.filter(
-        (m) => !m.isRead && m.sender.id !== user?.id
-      );
-      unreadMessages.forEach((m) => messagesApi.markAsRead(m.id));
+    if (activeUserId) {
+      markConversationAsRead(activeUserId);
     }
-  }, [activeUserId, messages, user?.id]);
+  }, [activeUserId, markConversationAsRead]);
+
+  const handleTyping = useCallback(() => {
+    if (!activeUserId) return;
+    startTyping(activeUserId);
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    typingTimeoutRef.current = setTimeout(() => {
+      if (activeUserId) stopTyping(activeUserId);
+    }, 2000);
+  }, [activeUserId, startTyping, stopTyping]);
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !activeUserId) return;
-    sendMessageMutation.mutate(newMessage.trim());
+    if (!newMessage.trim() || !activeUserId || isSending) return;
+    setIsSending(true);
+    sendMessage(activeUserId, newMessage.trim());
+    setNewMessage('');
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    stopTyping(activeUserId);
   };
 
   const filteredConversations = conversations?.filter((c) =>
@@ -124,8 +168,13 @@ export function Messages() {
                       )}
                     >
                       <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-medium">
-                          {getInitials(conversation.user.firstName, conversation.user.lastName)}
+                        <div className="relative">
+                          <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-medium">
+                            {getInitials(conversation.user.firstName, conversation.user.lastName)}
+                          </div>
+                          {presenceState[conversation.user.id]?.status === 'online' && (
+                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full" />
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
@@ -143,10 +192,14 @@ export function Messages() {
                             </div>
                           )}
                           <div className="flex items-center justify-between mt-1">
-                            <p className="text-sm text-gray-600 truncate">
-                              {conversation.lastMessage.sender.id === user?.id && 'Vous: '}
-                              {conversation.lastMessage.content}
-                            </p>
+                            {typingUsers[conversation.user.id] ? (
+                              <p className="text-sm text-primary-600 italic">En train d'écrire...</p>
+                            ) : (
+                              <p className="text-sm text-gray-600 truncate">
+                                {conversation.lastMessage.sender.id === user?.id && 'Vous: '}
+                                {conversation.lastMessage.content}
+                              </p>
+                            )}
                             {conversation.unreadCount > 0 && (
                               <span className="bg-primary-600 text-white text-xs rounded-full px-2 py-0.5">
                                 {conversation.unreadCount}
@@ -187,10 +240,15 @@ export function Messages() {
                     >
                       <ArrowLeft className="h-5 w-5 text-gray-600" />
                     </button>
-                    <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-medium">
-                      {getInitials(
-                        activeConversation?.user.firstName || null,
-                        activeConversation?.user.lastName || null
+                    <div className="relative">
+                      <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-medium">
+                        {getInitials(
+                          activeConversation?.user.firstName || null,
+                          activeConversation?.user.lastName || null
+                        )}
+                      </div>
+                      {activeUserId && presenceState[activeUserId]?.status === 'online' && (
+                        <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full" />
                       )}
                     </div>
                     <div>
@@ -198,11 +256,17 @@ export function Messages() {
                         {activeConversation?.user.firstName}{' '}
                         {activeConversation?.user.lastName}
                       </div>
-                      {activeConversation?.lastMessage.booking && (
-                        <div className="text-sm text-gray-500">
-                          {activeConversation.lastMessage.booking.listing.title}
-                        </div>
-                      )}
+                      <div className="text-sm text-gray-500">
+                        {activeUserId && typingUsers[activeUserId] ? (
+                          <span className="text-primary-600 italic">En train d'écrire...</span>
+                        ) : activeUserId && presenceState[activeUserId]?.status === 'online' ? (
+                          <span className="text-green-600">En ligne</span>
+                        ) : activeConversation?.lastMessage.booking ? (
+                          activeConversation.lastMessage.booking.listing.title
+                        ) : (
+                          <span className="text-gray-400">Hors ligne</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <button className="p-2 hover:bg-gray-100 rounded-full">
@@ -271,14 +335,17 @@ export function Messages() {
                     <Input
                       placeholder="Écrivez votre message..."
                       value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
+                      onChange={(e) => {
+                        setNewMessage(e.target.value);
+                        handleTyping();
+                      }}
                       className="flex-1"
                     />
                     <Button
                       type="submit"
-                      disabled={!newMessage.trim() || sendMessageMutation.isPending}
+                      disabled={!newMessage.trim() || isSending}
                     >
-                      {sendMessageMutation.isPending ? (
+                      {isSending ? (
                         <Loader2 className="h-5 w-5 animate-spin" />
                       ) : (
                         <Send className="h-5 w-5" />

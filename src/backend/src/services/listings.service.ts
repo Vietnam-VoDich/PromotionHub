@@ -22,6 +22,13 @@ const listingSelect = {
   status: true,
   createdAt: true,
   updatedAt: true,
+  // Traffic data
+  dailyTraffic: true,
+  peakHours: true,
+  trafficSource: true,
+  trafficUpdatedAt: true,
+  // Advertiser history
+  pastAdvertisers: true,
   owner: {
     select: {
       id: true,

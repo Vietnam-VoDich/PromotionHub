@@ -3,7 +3,8 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   MapPin, Calendar, Ruler, ChevronLeft, ChevronRight,
-  Star, MessageSquare, Phone, Mail, Share2, Eye, Heart, TrendingUp
+  Star, MessageSquare, Phone, Mail, Share2, Eye, Heart, TrendingUp,
+  Users, Clock, Building2, BarChart3
 } from 'lucide-react';
 import { listingsApi, reviewsApi } from '@/lib/api';
 import { formatPrice, formatDate, LISTING_SIZES, getFullName } from '@/lib/utils';
@@ -267,6 +268,89 @@ export function ListingDetail() {
               )}
             </CardContent>
           </Card>
+
+          {/* Traffic Data */}
+          {listing.dailyTraffic && (
+            <Card>
+              <CardContent>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-primary-600" />
+                  Données de trafic
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl p-5">
+                    <div className="flex items-center gap-3 mb-2">
+                      <Users className="h-6 w-6 text-primary-600" />
+                      <span className="text-sm text-primary-700 font-medium">Trafic journalier estimé</span>
+                    </div>
+                    <div className="text-3xl font-bold text-primary-900">
+                      {listing.dailyTraffic.toLocaleString('fr-FR')}
+                    </div>
+                    <div className="text-sm text-primary-600 mt-1">personnes / jour</div>
+                  </div>
+                  {listing.peakHours && (
+                    <div className="bg-gradient-to-br from-secondary-50 to-secondary-100 rounded-xl p-5">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Clock className="h-6 w-6 text-secondary-600" />
+                        <span className="text-sm text-secondary-700 font-medium">Heures de pointe</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {(JSON.parse(listing.peakHours) as string[]).map((hour, i) => (
+                          <span
+                            key={i}
+                            className="bg-white px-3 py-1.5 rounded-full text-sm font-medium text-secondary-700 shadow-sm"
+                          >
+                            {hour}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {listing.trafficSource && (
+                  <p className="text-xs text-gray-500 mt-4 flex items-center gap-1">
+                    <TrendingUp className="h-3 w-3" />
+                    Source: {listing.trafficSource}
+                    {listing.trafficUpdatedAt && (
+                      <span className="ml-2">
+                        (mis à jour le {new Date(listing.trafficUpdatedAt).toLocaleDateString('fr-FR')})
+                      </span>
+                    )}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Advertiser History */}
+          {listing.pastAdvertisers && (
+            <Card>
+              <CardContent>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Building2 className="h-5 w-5 text-primary-600" />
+                  Marques ayant utilisé cet emplacement
+                </h2>
+                <div className="flex flex-wrap gap-3">
+                  {(JSON.parse(listing.pastAdvertisers) as string[]).map((brand, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 transition-colors px-4 py-2 rounded-full"
+                    >
+                      <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">
+                        <span className="text-sm font-bold text-primary-600">
+                          {brand.charAt(0)}
+                        </span>
+                      </div>
+                      <span className="font-medium text-gray-700">{brand}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-500 mt-4">
+                  Ces marques ont fait confiance à cet emplacement pour leurs campagnes publicitaires.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Owner */}
           <Card>

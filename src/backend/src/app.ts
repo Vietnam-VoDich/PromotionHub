@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
 import { rateLimit } from 'express-rate-limit';
+import passport from 'passport';
 
 import { errorHandler } from './middleware/errorHandler.js';
 import { notFoundHandler } from './middleware/notFoundHandler.js';
@@ -21,6 +22,11 @@ import { adminRouter } from './routes/admin.routes.js';
 import { analyticsRouter } from './routes/analytics.routes.js';
 import { pushRouter } from './routes/push.routes.js';
 import newsletterRouter from './routes/newsletter.routes.js';
+import { blogRouter } from './routes/blog.routes.js';
+import { imageAnalysisRouter } from './routes/image-analysis.routes.js';
+import { sitemapRouter } from './routes/sitemap.routes.js';
+import { blockchainRouter } from './routes/blockchain.routes.js';
+import { favoritesRouter } from './routes/favorites.routes.js';
 
 export const app: Express = express();
 
@@ -47,6 +53,9 @@ app.use('/api', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Passport OAuth
+app.use(passport.initialize());
+
 // Logging
 if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('combined'));
@@ -70,6 +79,9 @@ app.get('/', (_req, res) => {
   });
 });
 
+// SEO - Sitemap and robots.txt (at root level)
+app.use('/', sitemapRouter);
+
 // API Documentation
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.get('/api/docs.json', (_req, res) => {
@@ -90,6 +102,10 @@ app.use('/api/admin', adminRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/push', pushRouter);
 app.use('/api/newsletter', newsletterRouter);
+app.use('/api/blog', blogRouter);
+app.use('/api/images', imageAnalysisRouter);
+app.use('/api/blockchain', blockchainRouter);
+app.use('/api/favorites', favoritesRouter);
 
 // Error handling
 app.use(notFoundHandler);

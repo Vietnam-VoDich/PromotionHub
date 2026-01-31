@@ -19,8 +19,15 @@ import {
   AdminListings,
   AdminVerifications,
   AdminNewsletter,
+  AdminBlog,
 } from '@/pages/admin';
 import { MapSearch } from '@/pages/MapSearch';
+import { AuthCallback } from '@/pages/AuthCallback';
+import { Blog } from '@/pages/Blog';
+import { BlogPost } from '@/pages/BlogPost';
+import { BookingDetail } from '@/pages/BookingDetail';
+import { Favorites } from '@/pages/Favorites';
+import { DashboardAnalytics } from '@/pages/DashboardAnalytics';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuthStore();
@@ -79,9 +86,12 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/listings" element={<Listings />} />
         <Route path="/listings/:id" element={<ListingDetail />} />
         <Route path="/map" element={<MapSearch />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
 
         {/* Mockups Preview - Design System */}
         <Route path="/mockups" element={<MockupsDemo />} />
@@ -135,6 +145,30 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/bookings/:id"
+          element={
+            <ProtectedRoute>
+              <BookingDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/favorites"
+          element={
+            <ProtectedRoute>
+              <Favorites />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoute>
+              <DashboardAnalytics />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Admin routes */}
         <Route
@@ -174,6 +208,14 @@ function App() {
           element={
             <AdminRoute>
               <AdminNewsletter />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/blog"
+          element={
+            <AdminRoute>
+              <AdminBlog />
             </AdminRoute>
           }
         />

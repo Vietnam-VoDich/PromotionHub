@@ -1,7 +1,9 @@
 import { Router } from 'express';
+import passport from 'passport';
 import { authController } from '../controllers/auth.controller.js';
 import { validate } from '../middleware/validate.js';
 import { signupSchema, loginSchema, refreshTokenSchema } from '../schemas/auth.schema.js';
+import '../config/passport.js';
 
 export const authRouter = Router();
 
@@ -243,3 +245,69 @@ authRouter.post('/forgot-password', authController.forgotPassword);
  *         description: Invalid token
  */
 authRouter.post('/reset-password', authController.resetPassword);
+
+// ============================================
+// OAuth Routes
+// ============================================
+
+/**
+ * @swagger
+ * /api/auth/google:
+ *   get:
+ *     summary: Initiate Google OAuth login
+ *     tags: [Auth]
+ *     responses:
+ *       302:
+ *         description: Redirects to Google login
+ */
+authRouter.get(
+  '/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+/**
+ * @swagger
+ * /api/auth/google/callback:
+ *   get:
+ *     summary: Google OAuth callback
+ *     tags: [Auth]
+ *     responses:
+ *       302:
+ *         description: Redirects to frontend with tokens
+ */
+authRouter.get(
+  '/google/callback',
+  passport.authenticate('google', { session: false, failureRedirect: '/login?error=google_auth_failed' }),
+  authController.oauthCallback
+);
+
+/**
+ * @swagger
+ * /api/auth/facebook:
+ *   get:
+ *     summary: Initiate Facebook OAuth login
+ *     tags: [Auth]
+ *     responses:
+ *       302:
+ *         description: Redirects to Facebook login
+ */
+authRouter.get(
+  '/facebook',
+  passport.authenticate('facebook', { scope: ['email'] })
+);
+
+/**
+ * @swagger
+ * /api/auth/facebook/callback:
+ *   get:
+ *     summary: Facebook OAuth callback
+ *     tags: [Auth]
+ *     responses:
+ *       302:
+ *         description: Redirects to frontend with tokens
+ */
+authRouter.get(
+  '/facebook/callback',
+  passport.authenticate('facebook', { session: false, failureRedirect: '/login?error=facebook_auth_failed' }),
+  authController.oauthCallback
+);

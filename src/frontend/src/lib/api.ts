@@ -375,4 +375,194 @@ export const newsletterApi = {
   },
 };
 
+// Blog
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  content: string;
+  coverImage: string | null;
+  authorId: string | null;
+  authorName: string | null;
+  status: 'draft' | 'published' | 'archived';
+  publishedAt: string | null;
+  viewCount: number;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  metaKeywords: string | null;
+  canonicalUrl: string | null;
+  ogImage: string | null;
+  readingTime: number | null;
+  featured: boolean;
+  createdAt: string;
+  updatedAt: string;
+  categories: Array<{ id: string; slug: string; name: string }>;
+  tags: Array<{ id: string; slug: string; name: string }>;
+}
+
+export interface BlogCategory {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  parentId: string | null;
+  order: number;
+  _count?: { posts: number };
+}
+
+export interface BlogTag {
+  id: string;
+  slug: string;
+  name: string;
+  _count?: { posts: number };
+}
+
+export const blogApi = {
+  getPosts: async (params?: {
+    page?: number;
+    limit?: number;
+    category?: string;
+    tag?: string;
+    search?: string;
+    featured?: boolean;
+  }) => {
+    const { data } = await api.get<PaginatedResponse<BlogPost>>('/blog', { params });
+    return data;
+  },
+
+  getPost: async (slug: string) => {
+    const { data } = await api.get<BlogPost>(`/blog/${slug}`);
+    return data;
+  },
+
+  getFeatured: async () => {
+    const { data } = await api.get<BlogPost[]>('/blog/featured');
+    return data;
+  },
+
+  getCategories: async () => {
+    const { data } = await api.get<BlogCategory[]>('/blog/categories');
+    return data;
+  },
+
+  getTags: async () => {
+    const { data } = await api.get<BlogTag[]>('/blog/tags');
+    return data;
+  },
+
+  getSitemap: async () => {
+    const { data } = await api.get<{
+      posts: Array<{ slug: string; updatedAt: string; publishedAt: string }>;
+      categories: Array<{ slug: string; createdAt: string }>;
+    }>('/blog/sitemap');
+    return data;
+  },
+
+  // Admin
+  createPost: async (postData: Partial<BlogPost> & { categoryIds?: string[]; tagIds?: string[] }) => {
+    const { data } = await api.post<BlogPost>('/blog', postData);
+    return data;
+  },
+
+  updatePost: async (slug: string, postData: Partial<BlogPost> & { categoryIds?: string[]; tagIds?: string[] }) => {
+    const { data } = await api.put<BlogPost>(`/blog/${slug}`, postData);
+    return data;
+  },
+
+  deletePost: async (slug: string) => {
+    await api.delete(`/blog/${slug}`);
+  },
+
+  createCategory: async (categoryData: { name: string; slug: string; description?: string }) => {
+    const { data } = await api.post<BlogCategory>('/blog/categories', categoryData);
+    return data;
+  },
+
+  createTag: async (tagData: { name: string; slug: string }) => {
+    const { data } = await api.post<BlogTag>('/blog/tags', tagData);
+    return data;
+  },
+};
+
+// Favorites API
+export const favoritesApi = {
+  getAll: async (params?: { page?: number; limit?: number }) => {
+    const { data } = await api.get<PaginatedResponse<Listing & { favoritedAt: string }>>('/favorites', { params });
+    return data;
+  },
+
+  getIds: async () => {
+    const { data } = await api.get<{ favoriteIds: string[] }>('/favorites/ids');
+    return data;
+  },
+
+  check: async (listingId: string) => {
+    const { data } = await api.get<{ favorited: boolean }>(`/favorites/${listingId}`);
+    return data;
+  },
+
+  checkMultiple: async (listingIds: string[]) => {
+    const { data } = await api.post<Record<string, boolean>>('/favorites/check', { listingIds });
+    return data;
+  },
+
+  add: async (listingId: string) => {
+    const { data } = await api.post<{ message: string; favorited: boolean }>(`/favorites/${listingId}`);
+    return data;
+  },
+
+  remove: async (listingId: string) => {
+    const { data } = await api.delete<{ message: string; favorited: boolean }>(`/favorites/${listingId}`);
+    return data;
+  },
+
+  toggle: async (listingId: string) => {
+    const { data } = await api.post<{ message: string; favorited: boolean }>(`/favorites/${listingId}/toggle`);
+    return data;
+  },
+};
+
+// Blockchain API
+import type { BlockchainCertification, BlockchainVerification, BlockchainInfo } from '@/types';
+
+export const blockchainApi = {
+  getInfo: async () => {
+    const { data } = await api.get<BlockchainInfo>('/blockchain/info');
+    return data;
+  },
+
+  certifyBooking: async (bookingId: string) => {
+    const { data } = await api.post<{
+      success: boolean;
+      message: string;
+      certification: BlockchainCertification;
+    }>(`/blockchain/certify/booking/${bookingId}`);
+    return data;
+  },
+
+  certifyPayment: async (paymentId: string) => {
+    const { data } = await api.post<{
+      success: boolean;
+      message: string;
+      certification: BlockchainCertification;
+    }>(`/blockchain/certify/payment/${paymentId}`);
+    return data;
+  },
+
+  verifyBooking: async (bookingId: string) => {
+    const { data } = await api.get<BlockchainVerification>(`/blockchain/verify/booking/${bookingId}`);
+    return data;
+  },
+
+  getStatus: async (entityType: string, entityId: string) => {
+    const { data } = await api.get<{
+      certified: boolean;
+      certification?: BlockchainCertification;
+      message?: string;
+    }>(`/blockchain/status/${entityType}/${entityId}`);
+    return data;
+  },
+};
+
 export default api;
